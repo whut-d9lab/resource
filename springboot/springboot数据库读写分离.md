@@ -102,6 +102,64 @@ spring:
 
 ### 3 java代码
 
+- DataSourceConfig
+
+```java
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+
+import javax.sql.DataSource;
+import java.util.HashMap;
+import java.util.Map;
+
+
+/**
+ * @Author shuxibing
+ * @Date 2020/9/12 15:06
+ * @Uint d9lab_2019
+ * @Description:
+ */
+@Configuration
+@Slf4j
+public class DataSourceConfig {
+
+
+    @Primary
+    @Bean
+    @ConfigurationProperties("spring.datasource.master")
+    public DataSource masterDataSource()
+    {
+        return DataSourceBuilder.create().build();
+    }
+
+    @Bean
+    @ConfigurationProperties("spring.datasource.slave")
+    public DataSource slaveDataSource() {
+        return DataSourceBuilder.create().build();
+    }
+
+
+    //配置数据库信息
+    @Bean
+    public DataSource myRoutingDataSource(@Qualifier("masterDataSource") DataSource masterDataSource,
+                                          @Qualifier("slaveDataSource") DataSource slaveDataSource) {
+        Map<Object, Object> targetDataSources = new HashMap<>();
+        targetDataSources.put("master", masterDataSource);
+        targetDataSources.put("slave", slaveDataSource);
+        MyRoutingDataSource myRoutingDataSource = new MyRoutingDataSource();
+        myRoutingDataSource.setDefaultTargetDataSource(masterDataSource);
+        myRoutingDataSource.setTargetDataSources(targetDataSources);
+        return myRoutingDataSource;
+    }
+
+}
+```
+
 - MyRoutingDataSource (数据源配置)
 
 ```java
