@@ -176,7 +176,7 @@ docker rm [NAME]/[CONTAINERID]
 #### 3.2.6 查看日志
 
 ```
-docker logs -f Nmae/id
+docker logs -f Name/id
 ```
 
 ## 4 docker修改容器的配置
